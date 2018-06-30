@@ -9,38 +9,58 @@ require("dotenv").config();
 var request = require("request");
 var Spotify = require("node-spotify-api");
 var Twitter = require("twitter");
+var fs = require("fs");
+var input = process.argv;
+var command = input[2];
+var action = input[3];
 
 //access specific keys
 var spotify = new Spotify(keys.spotify);
 var client = new Twitter(keys.twitter);
 
+//attempted to learn switchback command with tutor
+switch(command) {
+    case "my-tweets":
+    console.log(action);
+    break;
+    
+    case "spotify-this-song":
+    console.log(action);
+    break;
+
+    case "movie-this":
+    console.log(action);
+    break;
+
+    case "do-what-it-says":
+    doWhatitSays();
+    break;
+};
+
+
 //'my-tweets' NOT WORKING - I tried changing API keys, using the keys slacked, made sure my screen-name is correct, but it's not working
-var userCommand = process.argv[2];
 
-if (userCommand === "my-tweets") {
-    var myTweets = {screen_name: "Existentialismy"};
-}
 
-//var twitter = function () {
-    var params = {
-        screen_name: 'Existentialismy',
+function Twitter(action) {
+    
+var params = {
+        screen_name: 'Existentialismy', action,
         count: 20
     };
     client.get('statuses/user_timeline', params, function (error, tweets, response) {
         if (!error) {
-            console.log(tweets);
-        } else {
             for (var i = 0; i < tweets.length; i++) {
                 console.lot(tweets[i].text);
             }
+        } else {
+            console.log(error);
         }
-    });
-;
+    })
+};
 
 //'movie-this'
-var Movie = function () {
-    this.optionMatcher = function (movieName) {
-        var URL = "http://www.omdbapi.com/?apikey=eaecc1d7&" + movieName;
+function movie(action) {
+        var URL = "http://www.omdbapi.com/?t=" + action + "&y=&plot=short&apikey=eaecc1d7&";
 
         request(URL, function (err, response, body) {
             var jsonData = JSON.parse(body);
@@ -62,50 +82,60 @@ var Movie = function () {
                 console.log(movieData);
             }
         })
-    }
-}
+    };
+
 //'spotify-this-song'
-var mySpotify = function(songName) {
-spotify.search({ type: 'track', query: songName }, function(err, data) {
+function Spotify(action) {
+    if(!action) {
+        action = 'I want it that way';
+    }
+spotify.search({ type: 'track', query: action }, function(err, data) {
     if ( err ) {
         console.log('Error occurred: ' + err);
         return;
     }
  
-    console.log(data.tracks.items[0]);
-});
-}
+    var songData = data.tracks.items;
+    console.log("Artist: " + songData[0].artists[0].name);
+    console.log("Song Name: " + songData[0].name);
+    console.log("Preview Link: " + songData[0].preview_url);
+    console.log("Album: " + songData[0]. ablum.name);
+    });
+};
+
+//do-what-it-says
+function doWhatitSays() {
+    fs.readFile('random.txt', function(err,data){
+        if(err) {
+            console.log(err);
+        }
+    })
+
+var dataArr = data.split(",");
+
+    if(dataArr[0] === "spotify-this-song") {
+        var song = dataArr[1].slice(1, -1);
+        Spotify(song);
+    } else (dataArr[0] === "my-tweets") {
+        var myTweet = dataArr[1].slice(1, -1);
+        Twitter(myTweet);
+    } else (dataArr[0] === "movie-this") {
+        var myMovie = dataArr[1].slice(1, -1);
+        movie(myMovie);
+    };
+};
 
 
-var choose = function(caseData, functionData) {
-switch (caseData) {
-    case 'my-tweets':
-        console.log("twitter");
-        break;
-        case 'spotify-this-song':
-        mySpotify(functionData);
-        break;
-    default:
-        console.log("I don't understand.");
-    }
-}
-
-//attempted to learn switchback command with tutor
-// var command = process.argv[2];
-// switch(command) {
-//     case "spotify":
-//     console.log("spotify");
-//     break;
-
-//     case "twitter":
-//     console.log("twitter");
-//     break;
-
-//     case "OMDB":
-//     console.log("OMDB");
-//     OMDB(process.argv[3]) 
-//     break;
-
+// var choose = function(caseData, functionData) {
+// switch (caseData) {
+//     case 'my-tweets':
+//         console.log("twitter");
+//         break;
+//         case 'spotify-this-song':
+//         mySpotify(functionData);
+//         break;
 //     default:
-//     console.log("I don't understand.");
+//         console.log("I don't understand.");
+//     }
 // }
+

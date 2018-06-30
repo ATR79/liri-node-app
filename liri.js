@@ -7,22 +7,35 @@ var keys = require("./keys.js");
 //reguire npm packages
 require("dotenv").config();
 var request = require("request");
-var Spotify = require('node-spotify-api');
-var Twitter = require('twitter');
+var Spotify = require("node-spotify-api");
+var Twitter = require("twitter");
 
 //access specific keys
 var spotify = new Spotify(keys.spotify);
 var client = new Twitter(keys.twitter);
 
 //'my-tweets' NOT WORKING - I tried changing API keys, using the keys slacked, made sure my screen-name is correct, but it's not working
-var Tweets = function() {
-var params = {screen_name: 'Existentialismy', count: 20};
-client.get('statuses/user_timeline', params, function(error, tweets, response) {
-  if (!error) {
-    console.log(tweets);
+var userCommand = process.argv[2];
+
+if (userCommand === "my-tweets") {
+    var myTweets = {screen_name: "Existentialismy"};
+}
+
+//var twitter = function () {
+    var params = {
+        screen_name: 'Existentialismy',
+        count: 20
+    };
+    client.get('statuses/user_timeline', params, function (error, tweets, response) {
+        if (!error) {
+            console.log(tweets);
+        } else {
+            for (var i = 0; i < tweets.length; i++) {
+                console.lot(tweets[i].text);
+            }
         }
-    })
-};
+    });
+;
 
 //'movie-this'
 var Movie = function () {
@@ -43,7 +56,7 @@ var Movie = function () {
                 "Actors: " + jsonData.Actors
             ].join("\n\n");
 
-            if(err) throw err;
+            if (err) throw err;
 
             if (!err && response.statusCode === 200) {
                 console.log(movieData);
@@ -52,10 +65,30 @@ var Movie = function () {
     }
 }
 //'spotify-this-song'
+var mySpotify = function(songName) {
+spotify.search({ type: 'track', query: songName }, function(err, data) {
+    if ( err ) {
+        console.log('Error occurred: ' + err);
+        return;
+    }
+ 
+    console.log(data.tracks.items[0]);
+});
+}
 
 
-
-//'do-what-it-says'
+var choose = function(caseData, functionData) {
+switch (caseData) {
+    case 'my-tweets':
+        console.log("twitter");
+        break;
+        case 'spotify-this-song':
+        mySpotify(functionData);
+        break;
+    default:
+        console.log("I don't understand.");
+    }
+}
 
 //attempted to learn switchback command with tutor
 // var command = process.argv[2];
@@ -74,5 +107,5 @@ var Movie = function () {
 //     break;
 
 //     default:
-//     console.log("Pick one!");
+//     console.log("I don't understand.");
 // }

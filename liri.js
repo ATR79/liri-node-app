@@ -21,7 +21,7 @@ var client = new Twitter(keys.twitter);
 //attempted to learn switchback command with tutor
 switch(command) {
     case "my-tweets":
-    console.log(action);
+    runTwitter();
     break;
     
     case "spotify-this-song":
@@ -35,13 +35,15 @@ switch(command) {
     case "do-what-it-says":
     doWhatitSays();
     break;
+
+    default: 
+    console.log("I don't know this.");
 };
 
 
 //'my-tweets' NOT WORKING - I tried changing API keys, using the keys slacked, made sure my screen-name is correct, but it's not working
 
-
-function Twitter(action) {
+function runTwitter(action) {
     
 var params = {
         screen_name: 'Existentialismy', action,
@@ -85,7 +87,7 @@ function movie(action) {
     };
 
 //'spotify-this-song'
-function Spotify(action) {
+function runSpotify(action) {
     if(!action) {
         action = 'I want it that way';
     }
@@ -116,10 +118,10 @@ var dataArr = data.split(",");
     if(dataArr[0] === "spotify-this-song") {
         var song = dataArr[1].slice(1, -1);
         Spotify(song);
-    } else (dataArr[0] === "my-tweets") {
+    } else if(dataArr[0] === "my-tweets") {
         var myTweet = dataArr[1].slice(1, -1);
         Twitter(myTweet);
-    } else (dataArr[0] === "movie-this") {
+    } else if(dataArr[0] === "movie-this") {
         var myMovie = dataArr[1].slice(1, -1);
         movie(myMovie);
     };
